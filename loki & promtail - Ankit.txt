@@ -1,0 +1,44 @@
+VIMP NOTE: Promtail never feteches logs from the paths of HOST machines, 
+you hav to mount you host based log file path as a volume and then in the promtail-config.yaml file, map the path of the mount volume.
+
+https://grafana.com/docs/loki/latest/setup/install/docker/
+
+Expose port number 3100
+
+Step1: 
+    download loki-config.yml from:
+        wget https://raw.githubusercontent.com/grafana/loki/v2.9.4/cmd/loki/loki-local-config.yaml -O loki-config.yaml
+
+Step2: 
+    download promtail-config.yml:
+        wget https://raw.githubusercontent.com/grafana/loki/v2.9.4/clients/cmd/promtail/promtail-docker-config.yaml -O promtail-config.yaml
+
+Step3:
+        loki:
+            image: grafana/loki:latest
+            container_name: loki
+            ports:
+            - "3100:3100"
+            volumes:
+            - ./loki-config.yml:/mnt/config/loki-config.yaml
+            user: "root"
+
+
+
+Step4: 
+    configure the logs:
+        Docker logs paths: 
+            /var/lib/docker/containers/id_of_cont/id_of_cont.log 
+        
+        create a hard link using ln command
+            sudo ln /var/lib/docker/containers/id_of_cont/id_of_cont.log your/app/path/app.log
+
+Step5:
+    Configure the promtail-config.yaml file:
+
+    -- use the mount paths of volume 
+        eg: /mnt/config/app.log
+
+Step6:
+    use this in grafana.
+    

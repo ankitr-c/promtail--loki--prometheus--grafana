@@ -1,0 +1,47 @@
+Prometheus and Grafana Steps:
+
+Create a VM and Expose port number 9100, 9090, 3000
+
+Step1:
+	sudo apt-get install prometheus-node-exporter -y
+
+Step2:
+	sudo apt-get install docker.io docker-compose -y
+
+Step3: 
+	Create a dir name: data.
+
+Step4: 
+	Inside that directory create a prometheus-config.yml file and add the following
+
+		global:
+		  scrape_interval: 5s
+
+		scrape_configs:
+		  - job_name: 'host-metrix'
+		    static_configs:
+		      - targets: ['10.128.0.9:9100']
+
+Step5: 
+	create a docker-compose.yml file and add the following:
+
+		version: '3'
+
+		services:
+		  prometheus:
+		    image: prom/prometheus:latest
+		    container_name: prometheus
+		    ports:
+		      - "9090:9090"
+		    volumes:
+ 		     - ./prometheus-config.yml:/etc/prometheus/prometheus.yml
+
+		  grafana:
+		    image: grafana/grafana-oss
+		    container_name: grafana
+		    ports:
+		      - "3000:3000"
+
+Step6: 
+	Import ID: 1860
+

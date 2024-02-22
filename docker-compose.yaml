@@ -1,0 +1,48 @@
+version: '3.1'
+services:
+  app:
+    image: ankitraut0987/log-app:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./flask_app.log:/app/flask_app.log
+    user: "root"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus-config.yml:/etc/prometheus/prometheus.yml
+    user: "root"
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+    user: "root"
+
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
+    command: -config.file=/mnt/config/loki-config.yaml
+    volumes:
+      - ./:/mnt/config
+    ports:
+      - "3100:3100"
+    user: "root"
+
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:latest
+    command: -config.file=/mnt/config/promtail-config.yaml
+    volumes:
+      - ./:/mnt/config
+      - /var/log:/var/log
+    links:
+      - loki
+    user: "root"

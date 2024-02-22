@@ -1,0 +1,10 @@
+FROM python:3.7-slim
+RUN apt-get update && apt-get install -y prometheus-node-exporter
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 8000
+EXPOSE 9100
+# CMD [ "python", "app.py" ]
+CMD prometheus-node-exporter & python app.py
